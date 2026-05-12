@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lockdown · Admin</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div id="login-view" class="view">
+    <form id="login-form" class="card">
+      <h1>Lockdown · Admin</h1>
+      <label>
+        <span>Логин</span>
+        <input type="text" name="username" autocomplete="username" required />
+      </label>
+      <label>
+        <span>Пароль</span>
+        <input type="password" name="password" autocomplete="current-password" required />
+      </label>
+      <button type="submit">Войти</button>
+      <p id="login-error" class="error"></p>
+    </form>
+  </div>
+
+  <div id="dash-view" class="view hidden">
+    <header class="topbar">
+      <div class="brand">Lockdown · Admin</div>
+      <nav class="tabs">
+        <button class="tab-btn active" data-tab="users">Пользователи</button>
+        <button class="tab-btn" data-tab="network">Network</button>
+      </nav>
+      <div class="status">
+        <span id="ws-state" class="pill pill-warn">—</span>
+        <button id="logout-btn" class="link">Выйти</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="tab-panel" data-panel="users">
+        <div class="meta">
+          <span id="mock-badge" class="pill hidden">MOCK</span>
+          <span>Снимок: <code id="snapshot-ts">—</code></span>
+          <span>Обновление каждые 2 сек</span>
+        </div>
+        <table class="users-table">
+          <thead>
+            <tr>
+              <th>Email</th>
+              <th>↑ Uplink</th>
+              <th>↓ Downlink</th>
+              <th>Всего</th>
+            </tr>
+          </thead>
+          <tbody id="users-tbody"></tbody>
+        </table>
+      </section>
+
+      <section class="tab-panel hidden" data-panel="network">
+        <div class="card metrics">
+          <h2>WebSocket метрики</h2>
+          <div class="grid">
+            <div><span class="k">URL</span><code id="m-url">—</code></div>
+            <div><span class="k">readyState</span><code id="m-state">—</code></div>
+            <div><span class="k">RTT (ping/pong)</span><code id="m-rtt">—</code></div>
+            <div><span class="k">Сообщений / сек</span><code id="m-rate">—</code></div>
+            <div><span class="k">Всего сообщений</span><code id="m-count">0</code></div>
+            <div><span class="k">Reconnects</span><code id="m-reconn">0</code></div>
+            <div><span class="k">Uptime соединения</span><code id="m-uptime">—</code></div>
+            <div><span class="k">Последний frame</span><code id="m-last">—</code></div>
+          </div>
+          <pre id="m-log" class="log"></pre>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
