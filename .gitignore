@@ -1,0 +1,26 @@
+# secrets
+.env
+.env.*
+!.env.example
+bot/config.py
+deploy/certs/
+
+# python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# data
+*.db
+*.sqlite
+*.log
+
+# editor
+.idea/
+.vscode/
+.DS_Store
+
+# system
+*.tmp
