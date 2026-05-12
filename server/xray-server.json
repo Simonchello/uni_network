@@ -1,0 +1,217 @@
+{
+  "log": {
+    "loglevel": "warning",
+    "access": "/var/log/xray/access.log",
+    "error": "/var/log/xray/error.log"
+  },
+  "stats": {},
+  "api": {
+    "tag": "api",
+    "services": [
+      "StatsService"
+    ]
+  },
+  "policy": {
+    "levels": {
+      "0": {
+        "statsUserUplink": true,
+        "statsUserDownlink": true
+      }
+    },
+    "system": {
+      "statsInboundUplink": true,
+      "statsInboundDownlink": true
+    }
+  },
+  "routing": {
+    "rules": [
+      {
+        "inboundTag": [
+          "api-in"
+        ],
+        "outboundTag": "api",
+        "type": "field"
+      }
+    ]
+  },
+  "inbounds": [
+    {
+      "tag": "api-in",
+      "listen": "127.0.0.1",
+      "port": 10085,
+      "protocol": "dokodemo-door",
+      "settings": {
+        "address": "127.0.0.1"
+      }
+    },
+    {
+      "tag": "vless-reality-vision",
+      "listen": "0.0.0.0",
+      "port": 443,
+      "protocol": "vless",
+      "settings": {
+        "clients": [
+          {
+            "id": "00000000-0000-0000-0000-000000000001",
+            "email": "user1",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "00000000-0000-0000-0000-000000000002",
+            "email": "user2",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "00000000-0000-0000-0000-000000000003",
+            "email": "user3",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "00000000-0000-0000-0000-000000000004",
+            "email": "user4",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "00000000-0000-0000-0000-000000000005",
+            "email": "user5",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "00000000-0000-0000-0000-000000000006",
+            "email": "user6",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "00000000-0000-0000-0000-000000000007",
+            "email": "user7",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "00000000-0000-0000-0000-000000000008",
+            "email": "user8",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "00000000-0000-0000-0000-000000000009",
+            "email": "user9",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "id": "00000000-0000-0000-0000-000000000010",
+            "email": "user10",
+            "flow": "xtls-rprx-vision"
+          }
+        ],
+        "decryption": "none"
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "dest": "<MASKED_SNI_HOST>:443",
+          "serverNames": [
+            "<MASKED_SNI_HOST>"
+          ],
+          "privateKey": "REPLACE_WITH_PRIVATE_KEY_FROM_xray_x25519",
+          "shortIds": [
+            "REPLACE_WITH_SHORT_ID_HEX"
+          ]
+        }
+      },
+      "sniffing": {
+        "enabled": true,
+        "destOverride": [
+          "http",
+          "tls",
+          "quic"
+        ]
+      }
+    },
+    {
+      "tag": "vless-reality-xhttp",
+      "listen": "0.0.0.0",
+      "port": 2096,
+      "protocol": "vless",
+      "settings": {
+        "clients": [
+          {
+            "id": "00000000-0000-0000-0000-000000000001",
+            "email": "user1"
+          },
+          {
+            "id": "00000000-0000-0000-0000-000000000002",
+            "email": "user2"
+          },
+          {
+            "id": "00000000-0000-0000-0000-000000000003",
+            "email": "user3"
+          },
+          {
+            "id": "00000000-0000-0000-0000-000000000004",
+            "email": "user4"
+          },
+          {
+            "id": "00000000-0000-0000-0000-000000000005",
+            "email": "user5"
+          },
+          {
+            "id": "00000000-0000-0000-0000-000000000006",
+            "email": "user6"
+          },
+          {
+            "id": "00000000-0000-0000-0000-000000000007",
+            "email": "user7"
+          },
+          {
+            "id": "00000000-0000-0000-0000-000000000008",
+            "email": "user8"
+          },
+          {
+            "id": "00000000-0000-0000-0000-000000000009",
+            "email": "user9"
+          },
+          {
+            "id": "00000000-0000-0000-0000-000000000010",
+            "email": "user10"
+          }
+        ],
+        "decryption": "none"
+      },
+      "streamSettings": {
+        "network": "xhttp",
+        "xhttpSettings": {
+          "path": "/xhttp"
+        },
+        "security": "reality",
+        "realitySettings": {
+          "dest": "<MASKED_SNI_HOST>:443",
+          "serverNames": [
+            "<MASKED_SNI_HOST>"
+          ],
+          "privateKey": "REPLACE_WITH_PRIVATE_KEY_FROM_xray_x25519",
+          "shortIds": [
+            "REPLACE_WITH_SHORT_ID_HEX"
+          ]
+        }
+      },
+      "sniffing": {
+        "enabled": true,
+        "destOverride": [
+          "http",
+          "tls",
+          "quic"
+        ]
+      }
+    }
+  ],
+  "outbounds": [
+    {
+      "tag": "direct",
+      "protocol": "freedom"
+    },
+    {
+      "tag": "block",
+      "protocol": "blackhole"
+    }
+  ]
+}
