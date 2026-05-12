@@ -1,0 +1,17 @@
+[Unit]
+Description=Xray Telegram Bot
+After=xray.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/xray-bot
+ExecStart=/opt/xray-bot/venv/bin/python /opt/xray-bot/bot.py
+Restart=always
+RestartSec=5
+User=root
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

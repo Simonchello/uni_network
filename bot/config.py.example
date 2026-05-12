@@ -1,0 +1,25 @@
+# Telegram Bot configuration
+# Copy this to config.py and fill in the values.
+# chmod 600 config.py
+
+BOT_TOKEN = "YOUR_BOT_TOKEN_FROM_BOTFATHER"
+
+# Telegram IDs of admin users (find your ID via @userinfobot)
+ADMIN_IDS = [
+    # 123456789,
+]
+
+# Xray server settings
+SERVER_IP = "<YOUR_VPS_IP>"
+VISION_PORT = 443
+XHTTP_PORT = 2096
+SNI = "<MASKED_SNI_HOST>"
+FINGERPRINT = "chrome"
+PUBLIC_KEY = "REPLACE_WITH_PUBLIC_KEY_FROM_xray_x25519"
+SHORT_ID = "REPLACE_WITH_SHORT_ID_HEX"
+XHTTP_PATH = "/xhttp"
+
+# Paths
+XRAY_CONFIG_PATH = "/usr/local/etc/xray/config.json"
+XRAY_STATS_SERVER = "127.0.0.1:10085"
+DB_PATH = "/opt/xray-bot/bot.db"
