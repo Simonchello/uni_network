@@ -1,0 +1,18 @@
+[Unit]
+Description=Lockdown web admin (FastAPI)
+After=network-online.target xray.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/lockdown-web
+EnvironmentFile=/opt/lockdown-web/.env
+ExecStart=/opt/lockdown-web/.venv/bin/uvicorn web.main:app --host 127.0.0.1 --port 8001
+Restart=on-failure
+RestartSec=3
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
