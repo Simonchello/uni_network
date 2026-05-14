@@ -113,6 +113,10 @@ button:hover { filter: brightness(1.1); }
   background: transparent;
   color: var(--muted);
   padding: 6px 8px;
+  text-decoration: none;
+  font: inherit;
+  cursor: pointer;
+  border: 0;
 }
 .link:hover { color: var(--text); }
 

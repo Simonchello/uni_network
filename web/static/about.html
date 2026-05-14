@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lockdown — описание проекта</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <link rel="stylesheet" href="/static/about.css" />
+</head>
+<body class="about-body">
+  <header class="topbar">
+    <div class="brand">Lockdown</div>
+    <nav class="tabs">
+      <a class="tab-btn" href="/">Админка</a>
+      <span class="tab-btn active">О проекте</span>
+    </nav>
+    <div class="status">
+      <a class="link" href="https://github.com/Simonchello/uni_network" target="_blank" rel="noopener">GitHub →</a>
+    </div>
+  </header>
+
+  <main class="about-main">
+    <section class="about-card">
+      <h1>Lockdown</h1>
+      <p class="lede">
+        Self-hosted платформа для приватного удалённого доступа: многопротокольный шлюз
+        Xray (VLESS+Reality, VLESS+XHTTP), веб-админка с реалтайм-статистикой
+        по WebSocket и Telegram-бот для управления пользователями.
+      </p>
+
+      <h2>Функционал</h2>
+      <ul>
+        <li><strong>Реалтайм-дашборд:</strong> трафик каждого пользователя обновляется через WebSocket каждые 2 секунды без перезагрузки страницы.</li>
+        <li><strong>Метрики соединения:</strong> отдельная вкладка <em>Network</em> показывает RTT, message rate, reconnect count, uptime WS-соединения и лог событий.</li>
+        <li><strong>Аутентификация:</strong> логин/пароль на bcrypt + JWT-токен с TTL 24 часа.</li>
+        <li><strong>Telegram-бот:</strong> отдельный сервис выдаёт ключи через flow «заявка → одобрение», ведёт SQLite со списком пользователей.</li>
+        <li><strong>VPN-шлюз:</strong> Xray-core с двумя транспортами — VLESS+XTLS Vision+Reality (TCP) на :443 и VLESS+XHTTP+Reality (HTTP/2 multiplexing) на :2096.</li>
+        <li><strong>Статистика трафика:</strong> локальный gRPC API Xray на :10085, FastAPI читает его через subprocess <code>xray api statsquery</code> и распространяет данные подписчикам через pub-sub.</li>
+      </ul>
+
+      <h2>Архитектура</h2>
+<pre class="diagram">
+VPN-клиент ─TLS(Reality)─►  Xray  :443/:2096
+                              │
+                              │ gRPC stats (loopback :10085)
+                              ▼
+Browser ─HTTPS─► nginx :4443 ─proxy/upgrade─► uvicorn :8001 (FastAPI)
+                              │                  │
+                              │                  ├─ poll каждые 2s
+                              │                  ├─ JWT (bcrypt + HS256)
+                              │                  └─ WS broadcast (pub-sub)
+                              ▼
+                       статистика трафика
+                       по пользователям
+
+Telegram ─HTTPS long-poll─► bot (отдельный процесс) ─► xray config + SQLite
+</pre>
+
+      <h2>Стек</h2>
+      <table class="stack">
+        <tr><th>Компонент</th><th>Технология</th></tr>
+        <tr><td>Backend</td><td>FastAPI, uvicorn (Python 3.12)</td></tr>
+        <tr><td>Auth</td><td>bcrypt + PyJWT (HS256)</td></tr>
+        <tr><td>Realtime</td><td>WebSocket (RFC 6455) с heartbeat и reconnect</td></tr>
+        <tr><td>Bot</td><td>python-telegram-bot 20.x, aiosqlite</td></tr>
+        <tr><td>Proxy</td><td>nginx 1.27 (TLS termination, WS upgrade)</td></tr>
+        <tr><td>VPN</td><td>Xray-core (VLESS+Reality+Vision, VLESS+XHTTP+Reality)</td></tr>
+        <tr><td>Stats</td><td>xray gRPC API через CLI subprocess</td></tr>
+        <tr><td>Deploy</td><td>Docker Compose или systemd + rsync</td></tr>
+      </table>
+
+      <h2>Сетевые особенности</h2>
+      <ul>
+        <li>TLS 1.2/1.3 на nginx, HTTP/2 на внешнем порту, HTTP/1.1 на внутреннем upstream.</li>
+        <li>HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy.</li>
+        <li>Reality-handshake маскирует TLS под произвольный публичный TLS-сервер по SNI.</li>
+        <li>XTLS Vision не шифрует внутренний TLS дважды (передаёт passthrough).</li>
+        <li>WebSocket: ping/pong каждые 30 секунд, exponential backoff на reconnect (1s → 2s → 4s → … → 30s).</li>
+        <li>Pub-sub в админке: один фоновый poller дёргает xray и публикует снапшот в очереди подписчиков — N клиентов не создают N процессов xray.</li>
+      </ul>
+
+      <h2>Исходный код</h2>
+      <p>
+        Репозиторий проекта на GitHub:
+        <a class="github-link" href="https://github.com/Simonchello/uni_network" target="_blank" rel="noopener">
+          github.com/Simonchello/uni_network
+        </a>
+      </p>
+      <p class="repo-meta">
+        Документация по архитектуре и сетевому стеку — в <code>docs/ARCHITECTURE.md</code> и <code>docs/NETWORK_STACK.md</code>.
+        Деплой через Docker Compose (<code>docker compose up -d</code>) или нативно через
+        <code>deploy/setup_vps.sh</code>.
+      </p>
+    </section>
+  </main>
+</body>
+</html>
