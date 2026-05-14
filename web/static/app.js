@@ -44,14 +44,82 @@ function logout() {
   location.reload();
 }
 
+let sortState = { column: "total", direction: "desc" };
+let lastSnapshot = null;
+
+function compareEntries([emailA, a], [emailB, b]) {
+  let valA, valB;
+  switch (sortState.column) {
+    case "email":    valA = emailA; valB = emailB; break;
+    case "uplink":   valA = a.uplink || 0;   valB = b.uplink || 0; break;
+    case "downlink": valA = a.downlink || 0; valB = b.downlink || 0; break;
+    case "total":
+    default:
+      valA = (a.uplink || 0) + (a.downlink || 0);
+      valB = (b.uplink || 0) + (b.downlink || 0);
+      break;
+  }
+  const dir = sortState.direction === "asc" ? 1 : -1;
+  if (typeof valA === "string") return valA.localeCompare(valB) * dir;
+  return (valA - valB) * dir;
+}
+
+function updateSortIndicators() {
+  $$("th[data-sort]").forEach(th => {
+    const ind = th.querySelector(".th-indicator");
+    if (th.dataset.sort === sortState.column) {
+      ind.textContent = sortState.direction === "desc" ? " ↓" : " ↑";
+      th.classList.add("active-sort");
+    } else {
+      ind.textContent = "";
+      th.classList.remove("active-sort");
+    }
+  });
+}
+
+function setupSorting() {
+  $$("th[data-sort]").forEach(th => {
+    th.addEventListener("click", () => {
+      const col = th.dataset.sort;
+      if (sortState.column === col) {
+        sortState.direction = sortState.direction === "asc" ? "desc" : "asc";
+      } else {
+        sortState.column = col;
+        sortState.direction = col === "email" ? "asc" : "desc";
+      }
+      updateSortIndicators();
+      if (lastSnapshot) renderUsers(lastSnapshot);
+    });
+  });
+  updateSortIndicators();
+}
+
 function renderUsers(snapshot) {
+  lastSnapshot = snapshot;
   const tbody = $("#users-tbody");
-  const entries = Object.entries(snapshot || {}).sort(([a], [b]) => a.localeCompare(b));
+  const entries = Object.entries(snapshot || {});
   if (entries.length === 0) {
     tbody.innerHTML = `<tr><td colspan="4" style="color: var(--muted); text-align: center;">Нет данных</td></tr>`;
     return;
   }
-  tbody.innerHTML = entries.map(([email, row]) => {
+
+  let totalUp = 0, totalDown = 0;
+  for (const [, row] of entries) {
+    totalUp  += row.uplink   || 0;
+    totalDown += row.downlink || 0;
+  }
+
+  entries.sort(compareEntries);
+
+  const summaryRow = `
+    <tr class="users-total">
+      <td>Всего (${entries.length})</td>
+      <td class="num">${formatBytes(totalUp)}</td>
+      <td class="num">${formatBytes(totalDown)}</td>
+      <td class="num">${formatBytes(totalUp + totalDown)}</td>
+    </tr>`;
+
+  const userRows = entries.map(([email, row]) => {
     const total = (row.uplink || 0) + (row.downlink || 0);
     return `
       <tr>
@@ -61,6 +129,8 @@ function renderUsers(snapshot) {
         <td class="num">${formatBytes(total)}</td>
       </tr>`;
   }).join("");
+
+  tbody.innerHTML = summaryRow + userRows;
 }
 
 class WSClient {
@@ -212,6 +282,7 @@ function bootDashboard(token) {
   $("#login-view").classList.add("hidden");
   $("#dash-view").classList.remove("hidden");
   setupTabs();
+  setupSorting();
   const client = new WSClient(token, handleSnapshot, updateMetric);
   client.connect();
 

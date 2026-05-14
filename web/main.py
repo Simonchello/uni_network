@@ -10,6 +10,7 @@ from fastapi.staticfiles import StaticFiles
 from .config import get_settings
 from .routes_api import router as api_router
 from .routes_ws import router as ws_router
+from .stats_history import StatsHistory
 from .stats_poller import StatsPoller
 
 logging.basicConfig(
@@ -23,7 +24,12 @@ STATIC_DIR = Path(__file__).parent / "static"
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     settings = get_settings()
-    poller = StatsPoller(interval_sec=settings.poll_interval_sec, mock=settings.mock_stats)
+    history = None if settings.mock_stats else StatsHistory(settings.stats_state_file)
+    poller = StatsPoller(
+        interval_sec=settings.poll_interval_sec,
+        mock=settings.mock_stats,
+        history=history,
+    )
     await poller.start()
     app.state.poller = poller
     try:

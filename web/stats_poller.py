@@ -68,9 +68,10 @@ class StatsPoller:
     Why single poller: avoid spawning an xray subprocess per WS client.
     """
 
-    def __init__(self, interval_sec: float = 2.0, mock: bool = False) -> None:
+    def __init__(self, interval_sec: float = 2.0, mock: bool = False, history=None) -> None:
         self.interval = interval_sec
         self.mock = mock
+        self.history = history
         self._snapshot: Snapshot = {}
         self._last_ts: float = 0.0
         self._task: Optional[asyncio.Task] = None
@@ -114,6 +115,8 @@ class StatsPoller:
                     snap = self._mock_gen.tick()
                 else:
                     snap = await asyncio.to_thread(_query_xray)
+                if self.history is not None:
+                    snap = self.history.merge(snap)
                 self._snapshot = snap
                 self._last_ts = time.time()
                 await self._broadcast()

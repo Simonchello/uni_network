@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     bot_dir: Path = Path(__file__).parent.parent / "bot"
     host: str = "127.0.0.1"
     port: int = 8000
+    stats_state_file: Path = Path("/opt/lockdown-web/stats_state.json")
 
 
 @lru_cache

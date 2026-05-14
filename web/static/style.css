@@ -141,7 +141,16 @@ main { padding: 24px; }
 
 .users-table th { background: #1c232d; font-size: 12px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
 
+.users-table th.sortable { cursor: pointer; user-select: none; }
+.users-table th.sortable:hover { background: #232a36; color: var(--text); }
+.users-table th.active-sort { color: var(--accent); }
+.users-table th .th-indicator { font-size: 11px; opacity: 0.85; }
+
 .users-table tr:last-child td { border-bottom: 0; }
+
+.users-table tr.users-total td { background: #1c232d; font-weight: 600; }
+.users-table tr.users-total td:first-child { color: var(--muted); text-transform: uppercase; font-size: 12px; letter-spacing: 0.05em; }
+.users-table tr.users-total td.num { color: var(--text); }
 
 .users-table td.num { font-variant-numeric: tabular-nums; color: var(--accent); }
 
