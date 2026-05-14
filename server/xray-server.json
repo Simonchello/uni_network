@@ -108,13 +108,13 @@
         "network": "tcp",
         "security": "reality",
         "realitySettings": {
-          "dest": "<MASKED_SNI_HOST>:443",
+          "dest": "your-sni-host.example:443",
           "serverNames": [
-            "<MASKED_SNI_HOST>"
+            "your-sni-host.example"
           ],
-          "privateKey": "REPLACE_WITH_PRIVATE_KEY_FROM_xray_x25519",
+          "privateKey": "YOUR_REALITY_PRIVATE_KEY",
           "shortIds": [
-            "REPLACE_WITH_SHORT_ID_HEX"
+            "YOUR_SHORT_ID"
           ]
         }
       },
@@ -184,13 +184,13 @@
         },
         "security": "reality",
         "realitySettings": {
-          "dest": "<MASKED_SNI_HOST>:443",
+          "dest": "your-sni-host.example:443",
           "serverNames": [
-            "<MASKED_SNI_HOST>"
+            "your-sni-host.example"
           ],
-          "privateKey": "REPLACE_WITH_PRIVATE_KEY_FROM_xray_x25519",
+          "privateKey": "YOUR_REALITY_PRIVATE_KEY",
           "shortIds": [
-            "REPLACE_WITH_SHORT_ID_HEX"
+            "YOUR_SHORT_ID"
           ]
         }
       },

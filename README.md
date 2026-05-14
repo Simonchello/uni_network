@@ -1,8 +1,6 @@
 # Lockdown
 
-Self-hosted платформа для приватного удалённого доступа: многопротокольный шлюз Xray (VLESS+Reality, VLESS+XHTTP) плюс веб-админка с реалтайм-статистикой по WebSocket и Telegram-бот для управления пользователями.
-
-Шаблон — публичный, без личных данных. Все секреты подставляются при деплое.
+Self-hosted платформа для приватного удалённого доступа: многопротокольный шлюз Xray (VLESS+Reality, VLESS+XHTTP), веб-админка с реалтайм-статистикой по WebSocket и Telegram-бот для управления пользователями.
 
 ---
 
@@ -25,14 +23,14 @@ Self-hosted платформа для приватного удалённого 
 │   └── stats.py         — парсинг `xray api statsquery`
 │
 ├── server/
-│   └── xray-server.json — шаблон конфига Xray (плейсхолдеры для ключей)
+│   └── xray-server.json — конфиг Xray
 │
 ├── deploy/
-│   ├── nginx-lockdown.conf — nginx-конфиг для нативной установки
+│   ├── nginx-lockdown.conf — nginx для нативной установки
 │   ├── nginx-docker.conf   — то же, но для docker-compose
-│   ├── web-admin.service   — systemd unit для нативной установки
-│   ├── setup_vps.sh        — bootstrap скрипт (apt, venv, systemd, certbot)
-│   └── sync.sh             — rsync деплой кода на VPS
+│   ├── web-admin.service   — systemd unit
+│   ├── setup_vps.sh        — bootstrap (apt, venv, systemd, certbot)
+│   └── sync.sh             — rsync деплой на VPS
 │
 ├── docs/
 │   ├── ARCHITECTURE.md  — топология, потоки данных
@@ -82,7 +80,7 @@ cp web/.env.example .env
 JWT_SECRET=<openssl rand -hex 32>
 ADMIN_USERNAME=admin
 ADMIN_PASSWORD_HASH=<python -c "import bcrypt; print(bcrypt.hashpw(b'YOUR_PASSWORD', bcrypt.gensalt()).decode())">
-MOCK_STATS=1     # для запуска без Xray (генерирует тестовые данные)
+MOCK_STATS=1     # запустить без Xray на тестовых данных
 POLL_INTERVAL_SEC=2.0
 ```
 
@@ -102,7 +100,7 @@ deploy/certs/
 └── privkey.pem
 ```
 
-Получить Let's Encrypt-сертификат можно вне контейнера:
+Получить Let's Encrypt-сертификат вне контейнера:
 
 ```bash
 sudo certbot certonly --standalone -d your.domain.tld
@@ -129,21 +127,21 @@ docker compose logs -f web
 
 ## Конфигурация Xray
 
-`server/xray-server.json` — шаблон с плейсхолдерами. Перед использованием:
+В `server/xray-server.json` нужно подставить:
 
-1. Сгенерировать пару ключей Reality:
+1. Пару ключей Reality:
    ```bash
    xray x25519
    ```
-   Подставить `privateKey` в `xray-server.json` и `publicKey` в `bot/config.py`.
+   `privateKey` → `xray-server.json`, `publicKey` → `bot/config.py`.
 
-2. Сгенерировать `shortId`:
+2. `shortId`:
    ```bash
    openssl rand -hex 8
    ```
    Подставить в оба файла.
 
-3. Выбрать SNI-host (`serverNames` и `dest` в xray-server.json) — публично-доступный TLS-сервер для маскировки fingerprint.
+3. SNI-host (`serverNames` и `dest` в xray-server.json) — публично-доступный TLS-сервер для маскировки fingerprint.
 
 4. UUID клиентов — `xray uuid` или любой UUIDv4 генератор.
 
@@ -180,16 +178,10 @@ chmod 600 bot/config.py
 
 ## Безопасность
 
-- Все секреты — через `.env` (не коммитятся, в `.gitignore`)
+- Секреты — через `.env` (в `.gitignore`)
 - `chmod 600` на `bot/config.py` и `.env`
 - bcrypt cost factor 12
 - JWT с коротким TTL (24h), no refresh
 - HSTS, X-Frame-Options, X-Content-Type-Options
 - nginx HTTP/2 + TLS 1.2/1.3
 - Xray stats gRPC слушает только `127.0.0.1`
-
----
-
-## Лицензия
-
-MIT
